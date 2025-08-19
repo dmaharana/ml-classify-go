@@ -37,6 +37,13 @@ func NewModel() *Model {
 
 // Train trains the model on the provided training data
 func (m *Model) Train(data []TrainingData) {
+	// Reset model state to ensure training from scratch
+	m.Categories = make([]string, 0)
+	m.CategoryCounts = make(map[string]int)
+	m.WordCounts = make(map[string]map[string]int)
+	m.Vocabulary = make(map[string]int)
+	m.TotalWords = make(map[string]int)
+	m.TotalDocuments = 0
 	// Count categories and initialize data structures
 	categorySet := make(map[string]bool)
 	for _, item := range data {
@@ -66,6 +73,9 @@ func (m *Model) Train(data []TrainingData) {
 
 // Predict predicts the category of given text
 func (m *Model) Predict(text string) (string, map[string]float64) {
+	if m.TotalDocuments == 0 || len(m.Categories) == 0 {
+		return "", make(map[string]float64)
+	}
 	words := preprocessText(text)
 	scores := make(map[string]float64)
 

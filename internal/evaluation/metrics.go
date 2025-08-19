@@ -11,6 +11,10 @@ import (
 
 // EvaluateModel performs basic evaluation of the model
 func EvaluateModel(model *classifier.Model, testData []classifier.TrainingData) {
+	if len(testData) == 0 {
+		fmt.Println("No test data provided. Skipping evaluation.")
+		return
+	}
 	correct := 0
 	categoryStats := make(map[string]map[string]int)
 
@@ -66,21 +70,33 @@ func writeConfusionMatrixCSV(categories []string, categoryStats map[string]map[s
 	if err != nil {
 		log.Fatalf("failed creating file: %s", err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Error closing file: %v", err)
+		}
+	}()
 
 	writer := csv.NewWriter(file)
-	defer writer.Flush()
 
-	header := []string{"Actual\\Predicted"}
+	header := []string{"Actual\Predicted"}
 	header = append(header, categories...)
-	writer.Write(header)
+	if err := writer.Write(header); err != nil {
+		log.Fatalf("Error writing header to CSV: %v", err)
+	}
 
 	for _, actualCat := range categories {
 		row := []string{actualCat}
 		for _, predCat := range categories {
 			row = append(row, fmt.Sprintf("%d", categoryStats[actualCat][predCat]))
 		}
-		writer.Write(row)
+		if err := writer.Write(row); err != nil {
+			log.Fatalf("Error writing row to CSV: %v", err)
+		}
+	}
+
+	writer.Flush()
+	if err := writer.Error(); err != nil {
+		log.Fatalf("Error flushing CSV writer: %v", err)
 	}
 	fmt.Println("\nConfusion matrix saved to confusion_matrix.csv")
 }

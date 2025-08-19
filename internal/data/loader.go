@@ -125,7 +125,6 @@ func WriteClassificationResults(filename string, results []ClassificationResult)
 	defer file.Close()
 
 	writer := csv.NewWriter(file)
-	defer writer.Flush()
 
 	// Write header
 	header := []string{"text", "predicted_category", "confidence"}
@@ -145,5 +144,6 @@ func WriteClassificationResults(filename string, results []ClassificationResult)
 		}
 	}
 
-	return nil
+	writer.Flush()
+	return writer.Error()
 }
