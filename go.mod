@@ -1,3 +1,3 @@
-module ml-classify
+module ml-classify-go
 
 go 1.24.3

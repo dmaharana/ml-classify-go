@@ -1,3 +1,4 @@
 data/*
 *.csv
 *.json
+.~lock.confusion_matrix.csv#
