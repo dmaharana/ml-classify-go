@@ -1,5 +1,6 @@
 data/*
 bin/*
 *.csv
+*.csv#
 *.json
 .~lock.confusion_matrix.csv#
